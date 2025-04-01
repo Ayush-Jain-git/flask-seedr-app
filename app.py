@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -12,6 +13,7 @@ import os
 
 app = Flask(__name__)
 
+CORS(app, origins=["https://peppy-starlight-0d421a.netlify.app"])
 SEEDR_USERNAME = os.getenv("SEEDR_USERNAME")
 SEEDR_PASSWORD = os.getenv("SEEDR_PASSWORD")
 
