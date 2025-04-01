@@ -1,19 +1,23 @@
 # Start with a base image that includes Python
 FROM python:3.10-slim
 
-# Install necessary dependencies (e.g., wget, unzip, etc.)
+# Install necessary dependencies (e.g., wget, unzip, curl, jq for JSON parsing)
 RUN apt-get update && apt-get install -y \
     wget \
     unzip \
     curl \
+    jq \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Chromium and ChromeDriver
-RUN apt-get update && apt-get install -y \
-    chromium=90.0.4430.93-1 \
-    chromium-chromedriver=90.0.4430.93-1
+# Get the latest stable version of Chromium using the omahaproxy API
+RUN CHROMIUM_VERSION=$(curl -s https://omahaproxy.appspot.com/all.json | jq -r '.[0].versions[0].current_version') \
+    && echo "Chromium version: $CHROMIUM_VERSION" \
+    && wget https://chromedriver.storage.googleapis.com/${CHROMIUM_VERSION}/chromedriver_linux64.zip \
+    && unzip chromedriver_linux64.zip \
+    && mv chromedriver /usr/bin/ \
+    && rm chromedriver_linux64.zip
 
-# Install any other dependencies you need
+# Install the necessary Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Set the environment variable to use Chromium as the browser for Selenium
