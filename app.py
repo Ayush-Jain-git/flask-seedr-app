@@ -10,7 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 import os
-os.system("apt update && apt install -y chromium-browser chromium-chromedriver")
+
 
 app = Flask(__name__)
 
@@ -58,7 +58,13 @@ def get_magnet():
     return jsonify({"error": "No magnet link found"}), 404
 
 def upload_to_seedr(magnet_link):
-    service = Service(ChromeDriverManager().install())
+    os.system("apt update && apt install -y chromium-browser chromium-chromedriver")
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # Run without UI
+    chrome_options.add_argument("--no-sandbox")  # Required for Linux servers
+    chrome_options.add_argument("--disable-dev-shm-usage")  # Prevent crashes
+    chrome_options.binary_location = "/usr/bin/chromium-browser"  # Correct Chrome path
+    service = Service("/usr/bin/chromedriver")
     driver = webdriver.Chrome(service=service)
     wait = WebDriverWait(driver, 15)
 
