@@ -40,6 +40,10 @@ def get_magnet_link(search_query):
 
     return magnet_link["href"] if magnet_link else None
 
+@app.route("/")
+def home():
+    return "Flask backend is running!"
+    
 @app.route("/get-magnet", methods=["POST"])
 def get_magnet():
     data = request.json
