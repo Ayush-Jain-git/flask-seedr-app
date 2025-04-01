@@ -10,6 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 import os
+os.system("apt update && apt install -y chromium-browser chromium-chromedriver")
 
 app = Flask(__name__)
 
