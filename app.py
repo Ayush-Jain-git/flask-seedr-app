@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -58,14 +59,13 @@ def get_magnet():
     return jsonify({"error": "No magnet link found"}), 404
 
 def upload_to_seedr(magnet_link):
-    os.system("apt update && apt install -y chromium-browser chromium-chromedriver")
     chrome_options = Options()
     chrome_options.add_argument("--headless")  # Run without UI
     chrome_options.add_argument("--no-sandbox")  # Required for Linux servers
     chrome_options.add_argument("--disable-dev-shm-usage")  # Prevent crashes
     chrome_options.binary_location = "/usr/bin/chromium-browser"  # Correct Chrome path
     service = Service("/usr/bin/chromedriver")
-    driver = webdriver.Chrome(service=service)
+    driver = webdriver.Chrome(service=service, options=chrome_options)
     wait = WebDriverWait(driver, 15)
 
     driver.get("https://www.seedr.cc/")
@@ -126,4 +126,4 @@ def upload_magnet():
     return jsonify({"message": result})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
