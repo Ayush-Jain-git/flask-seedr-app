@@ -101,9 +101,12 @@ def upload_to_seedr(magnet_link):
     time.sleep(5)  
 
     try:
+        upload_input = wait.until(EC.visibility_of_element_located((By.NAME, "link")))
+        upload_input.clear()
+        upload_input.send_keys(magnet_link)
+    except Exception as e:
+        print("Fallback to JS injection due to:", e)
         driver.execute_script("document.querySelector('input[name=\"link\"]').value = arguments[0];", magnet_link)
-    except:
-        pass
 
     time.sleep(2)
 
