@@ -47,4 +47,4 @@ WORKDIR /app
 # Set environment variable so Selenium knows where Chrome is
 ENV CHROME_BIN=/usr/bin/google-chrome
 
-CMD ["gunicorn", "--timeout", "120", "-b", "0.0.0.0:5000", "app:app"]
+CMD ["sh", "-c", "gunicorn --timeout 180 -b 0.0.0.0:${PORT:-5000} -w 1 -k gthread app:app"]
