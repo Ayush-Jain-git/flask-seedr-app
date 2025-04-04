@@ -47,4 +47,4 @@ WORKDIR /app
 # Set environment variable so Selenium knows where Chrome is
 ENV CHROME_BIN=/usr/bin/google-chrome
 
-CMD ["python", "app.py"]
+CMD ["gunicorn", "--timeout", "120", "-b", "0.0.0.0:5000", "app:app"]
