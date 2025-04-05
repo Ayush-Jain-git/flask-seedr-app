@@ -120,7 +120,7 @@ def upload_to_seedr(magnet_link):
 
     try:
         driver.execute_script("document.querySelector('#upload-button').click();")
-         print("Succesfully clicked on upload button")
+        print("Succesfully clicked on upload button")
     except:
         print("not able to click on upload button")
         pass
