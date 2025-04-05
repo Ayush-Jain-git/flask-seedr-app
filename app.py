@@ -26,24 +26,17 @@ def get_magnet_link(search_query):
     
     response = requests.get(search_url, headers=headers)
     if response.status_code != 200:
-        print("Failed to fetch search results")
-        return None
-    
-    soup = BeautifulSoup(response.text, "html.parser")
-    
-    first_result = soup.select_one(".table-list tbody tr td.name a[href^='/torrent/']")
-    if not first_result:
-        print("No results found")
-        return None
-    
-    torrent_page_url = "https://tpirbay.top" + first_result["href"]
-    response = requests.get(torrent_page_url, headers=headers)
-    
-    if response.status_code != 200:
+        print("❌ Failed to fetch search results")
         return None
 
     soup = BeautifulSoup(response.text, "html.parser")
-    magnet_link = soup.select_one("a[href^='magnet:']")
+   
+    first_result = soup.select_one("table#searchResult tr")
+    if not first_result:
+        print("❌ No results found")
+        return None
+
+    magnet_link = first_result.select_one("a[href^='magnet:?xt=']")
 
     return magnet_link["href"] if magnet_link else None
 
