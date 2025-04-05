@@ -75,7 +75,9 @@ def upload_to_seedr(magnet_link):
     try:
         login_button = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "login")))
         login_button.click()
+        print("Succesfully login with credentials")
     except:
+        print("unsuccesfully credentials")
         pass
 
     try:
@@ -89,13 +91,17 @@ def upload_to_seedr(magnet_link):
         password_input = wait.until(EC.presence_of_element_located((By.NAME, "password")))
         email_input.send_keys(SEEDR_USERNAME)
         password_input.send_keys(SEEDR_PASSWORD)
+        print("Succesfully eneterd the credentials")
     except:
+        print("unsuccesfully eneterd the credentials")
         pass
 
     try:
         popup_login_button = wait.until(EC.element_to_be_clickable((By.ID, "login")))
         popup_login_button.click()
+        print("Succesfully clicked on login button")
     except:
+        print("unable to click the login button")
         pass
 
     time.sleep(5)  
@@ -104,15 +110,19 @@ def upload_to_seedr(magnet_link):
         upload_input = wait.until(EC.visibility_of_element_located((By.NAME, "link")))
         upload_input.clear()
         upload_input.send_keys(magnet_link)
+        print("Succesfully copied the magnet link")
     except Exception as e:
         print("Fallback to JS injection due to:", e)
         driver.execute_script("document.querySelector('input[name=\"link\"]').value = arguments[0];", magnet_link)
+        print("Succesfully copied the magnet link using JS")
 
     time.sleep(2)
 
     try:
         driver.execute_script("document.querySelector('#upload-button').click();")
+         print("Succesfully clicked on upload button")
     except:
+        print("not able to click on upload button")
         pass
 
     time.sleep(5)
