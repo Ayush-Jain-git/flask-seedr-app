@@ -21,24 +21,27 @@ SEEDR_USERNAME = os.getenv("SEEDR_USERNAME")
 SEEDR_PASSWORD = os.getenv("SEEDR_PASSWORD")
 
 def get_magnet_link(search_query):
-    search_url = f"https://tpirbay.top/search/{search_query}/1/99/0"
-    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"}
-    
-    response = requests.get(search_url, headers=headers)
+    url = f"https://tpirbay.top/search/{search_query.replace(' ', '%20')}/1/99/0"
+    headers = {
+        "User-Agent": "Mozilla/5.0"
+    }
+    response = requests.get(url, headers=headers)
     if response.status_code != 200:
-        print("❌ Failed to fetch search results")
+        print("Failed to load page")
         return None
 
     soup = BeautifulSoup(response.text, "html.parser")
-   
-    first_result = soup.select_one("table#searchResult tr")
-    if not first_result:
-        print("❌ No results found")
+    result = soup.find("div", class_="detName")
+    if not result:
+        print("No result div found")
         return None
 
-    magnet_link = first_result.select_one("a[href^='magnet:?xt=']")
-
-    return magnet_link["href"] if magnet_link else None
+    magnet_tag = result.find_next("a", href=True, title="Download this torrent using magnet")
+    if magnet_tag:
+        return magnet_tag["href"]
+    else:
+        print("No magnet found")
+        return None
 
 @app.route("/")
 def home():
