@@ -29,12 +29,23 @@ def get_magnet_link(search_query):
         return None
 
     soup = BeautifulSoup(response.text, "html.parser")
-    first_result = soup.select_one(".table-list tbody tr td.name a[href^='/torrent/']")
-    
-    if not first_result:
+    result_row = soup.select_one(".table-list tbody tr")
+    if not result_row:
+        print(" No result rows found")
         return None
 
-    torrent_page_url = "https://www.1337x.to" + first_result["href"]
+    name_cell = result_row.select_one("td.name")
+    if not name_cell:
+        print(" No name cell found")
+        return None
+
+    links = name_cell.find_all("a")
+    if len(links) < 2:
+        print("Torrent link not found")
+        return None
+
+    torrent_relative_link = links[1]["href"]
+    torrent_page_url = "https://www.1337x.to" + torrent_relative_link
     response = requests.get(torrent_page_url, headers=headers)
     
     if response.status_code != 200:
