@@ -22,26 +22,16 @@ SEEDR_PASSWORD = os.getenv("SEEDR_PASSWORD")
 
 def get_magnet_link(search_query):
     url = f"https://tpirbay.top/search/{search_query.replace(' ', '%20')}/1/99/0"
-    headers = {
-        "User-Agent": "Mozilla/5.0"
-    }
+    headers = {"User-Agent": "Mozilla/5.0"}
+
     response = requests.get(url, headers=headers)
     if response.status_code != 200:
-        print("Failed to load page")
         return None
 
     soup = BeautifulSoup(response.text, "html.parser")
-    result = soup.find("div", class_="detName")
-    if not result:
-        print("No result div found")
-        return None
+    magnet_link = soup.select_one("a[href^='magnet:']")
 
-    magnet_tag = result.find_next("a", href=True, title="Download this torrent using magnet")
-    if magnet_tag:
-        return magnet_tag["href"]
-    else:
-        print("No magnet found")
-        return None
+    return magnet_link["href"] if magnet_link else None
 
 @app.route("/")
 def home():
@@ -50,7 +40,7 @@ def home():
 @app.route("/get-magnet", methods=["POST"])
 def get_magnet():
     data = request.json
-    movie_name = data.get("movie")
+    movie_name = data.get("query")
     magnet_link = get_magnet_link(movie_name)
 
     if magnet_link:
