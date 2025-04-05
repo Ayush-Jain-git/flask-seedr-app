@@ -22,22 +22,19 @@ SEEDR_PASSWORD = os.getenv("SEEDR_PASSWORD")
 
 def get_magnet_link(search_query):
     search_url = f"https://www.1337x.to/search/{search_query}/1/"
-    headers = {"User-Agent": "Mozilla/5.0"}
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"}
     
     response = requests.get(search_url, headers=headers)
     if response.status_code != 200:
         return None
 
     soup = BeautifulSoup(response.text, "html.parser")
-    first_row = soup.select_one(".table-list tbody tr")
-    if not first_row:
+    first_result = soup.select_one(".table-list tbody tr td.name a[href^='/torrent/']")
+    
+    if not first_result:
         return None
 
-    torrent_links = first_row.select("td.name a[href^='/torrent/']")
-    if len(torrent_links) < 2:
-        return None
-
-    torrent_page_url = "https://www.1337x.to" + torrent_links[1]["href"]
+    torrent_page_url = "https://www.1337x.to" + first_result["href"]
     response = requests.get(torrent_page_url, headers=headers)
     
     if response.status_code != 200:
