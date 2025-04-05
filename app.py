@@ -60,6 +60,7 @@ def get_magnet():
 
 def upload_to_seedr(magnet_link):
     chrome_options = Options()
+    chrome_options.add_argument("--incognito")
     chrome_options.add_argument("--headless=new")  
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
@@ -125,7 +126,7 @@ def upload_to_seedr(magnet_link):
         print("not able to click on upload button")
         pass
 
-    time.sleep(3)
+    time.sleep(4)
     driver.quit()
     return "Uploaded Successfully"
 
