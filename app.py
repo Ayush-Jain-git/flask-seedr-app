@@ -125,7 +125,7 @@ def upload_to_seedr(magnet_link):
         print("not able to click on upload button")
         pass
 
-    time.sleep(5)
+    print("Closing browser to save ram")
     driver.quit()
     return "Uploaded Successfully"
 
