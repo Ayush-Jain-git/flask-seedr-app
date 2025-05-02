@@ -109,8 +109,16 @@ def upload_to_seedr(magnet_link):
         print("Succesfully copied the magnet link")
     except Exception as e:
         print("Fallback to JS injection due to:", e)
-        driver.execute_script("document.querySelector('input[name=\"link\"]').value = arguments[0];", magnet_link)
-        print("Succesfully copied the magnet link using JS")
+        try:
+            if driver.session_id:  # Ensure session is alive
+                driver.execute_script("document.querySelector('input[name=\"link\"]').value = arguments[0];", magnet_link)
+                print("Successfully set magnet link using JS injection")
+            else:
+                 print("Driver session is invalid, skipping JS injection")
+                
+        except Exception as js_e:
+             print("JS injection also failed:", js_e)
+             return "Upload failed: unable to input magnet link"   
 
     time.sleep(2)
 
