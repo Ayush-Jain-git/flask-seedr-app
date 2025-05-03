@@ -70,75 +70,70 @@ def upload_to_seedr(magnet_link):
     chrome_options.binary_location = "/usr/bin/google-chrome" 
     service = Service("/usr/bin/chromedriver")
     driver = None
-    
-   	try:
-		driver = webdriver.Chrome(service=service, options=chrome_options)
-		wait = WebDriverWait(driver, 15)
-	
-		driver.get("https://www.seedr.cc/")
-	
-		try:
-			login_button = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "login")))
-			login_button.click()
-			print("Succesfully login with credentials")
-		except:
-			print("unsuccesfully credentials")
-			pass
-	
-		try:
-			iframe = driver.find_element(By.TAG_NAME, "iframe")
-			driver.switch_to.frame(iframe)
-		except:
-			pass
-	
-		try:
-			email_input = wait.until(EC.presence_of_element_located((By.NAME, "username")))
-			password_input = wait.until(EC.presence_of_element_located((By.NAME, "password")))
-			email_input.send_keys(SEEDR_USERNAME)
-			password_input.send_keys(SEEDR_PASSWORD)
-			print("Succesfully eneterd the credentials")
-		except:
-			print("unsuccesfully eneterd the credentials")
-			pass
-	
-		try:
-			popup_login_button = wait.until(EC.element_to_be_clickable((By.ID, "login")))
-			popup_login_button.click()
-			print("Succesfully clicked on login button")
-		except:
-			print("unable to click the login button")
-			pass
-	
-		time.sleep(5)  
-	
-		try:
-			upload_input = wait.until(EC.visibility_of_element_located((By.NAME, "link")))
-			upload_input.clear()
-			upload_input.send_keys(magnet_link)
-			print("Succesfully copied the magnet link")
-		except Exception as e:
-			print("Fallback to JS injection due to:", e)
-			try:
-				if driver.session_id:  # Ensure session is alive
-					driver.execute_script("document.querySelector('input[name=\"link\"]').value = arguments[0];", magnet_link)
-					print("Successfully set magnet link using JS injection")
-				else:
-					print("Driver session is invalid, skipping JS injection")
-					
-			except Exception as js_e:
-				print("JS injection also failed:", js_e)
-				return "Upload failed: unable to input magnet link"   
-	
-		time.sleep(2)
-	
-		try:
-			driver.execute_script("document.querySelector('#upload-button').click();")
-			print("Succesfully clicked on upload button")
-		except:
-			print("not able to click on upload button")
-			pass
-	
-	except Exception as main_err:
+    try:
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+        wait = WebDriverWait(driver, 15)
+
+        driver.get("https://www.seedr.cc/")
+
+        try:
+            login_button = wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "login")))
+            login_button.click()
+            print("Clicked login button")
+        except Exception as e:
+            print("Login button click failed:", e)
+
+        try:
+            iframe = driver.find_element(By.TAG_NAME, "iframe")
+            driver.switch_to.frame(iframe)
+        except Exception:
+            print("Iframe not found, skipping switch.")
+
+        try:
+            email_input = wait.until(EC.presence_of_element_located((By.NAME, "username")))
+            password_input = wait.until(EC.presence_of_element_located((By.NAME, "password")))
+            email_input.send_keys(SEEDR_USERNAME)
+            password_input.send_keys(SEEDR_PASSWORD)
+            print("Entered credentials")
+        except Exception as e:
+            print("Credential input failed:", e)
+
+        try:
+            popup_login_button = wait.until(EC.element_to_be_clickable((By.ID, "login")))
+            popup_login_button.click()
+            print("Clicked login")
+        except Exception as e:
+            print("Login button click error:", e)
+
+        time.sleep(5)
+
+        try:
+            upload_input = wait.until(EC.visibility_of_element_located((By.NAME, "link")))
+            upload_input.clear()
+            upload_input.send_keys(magnet_link)
+            print("Magnet link input success")
+        except Exception as e:
+            print("Standard input failed. Falling back to JS injection:", e)
+            try:
+                driver.execute_script(
+                    "document.querySelector('input[name=\"link\"]').value = arguments[0];", 
+                    magnet_link
+                )
+                print("Magnet link set via JS")
+            except Exception as js_err:
+                print("JS injection failed:", js_err)
+
+        time.sleep(2)
+
+        try:
+            driver.execute_script("document.querySelector('#upload-button').click();")
+            print("Upload button clicked via JS")
+        except Exception as e:
+            print("Upload button click failed:", e)
+
+        time.sleep(3)
+
+    except Exception as main_err:
         print("Unexpected error in upload_to_seedr:", main_err)
 
     finally:
@@ -148,10 +143,13 @@ def upload_to_seedr(magnet_link):
                 print("Driver closed successfully.")
             except Exception as quit_err:
                 print("Error during driver.quit():", quit_err)
-				
-		print("Memory usage after Chrome (MB):", psutil.virtual_memory().used / 1024 / 1024)
-		
-	return "Uploaded Successfully"
+
+        # Memory usage after Chrome closes
+        print("Memory usage after Chrome (MB):", psutil.virtual_memory().used / 1024 / 1024)
+
+    return "Uploaded Successfully"
+
+
 
 @app.route("/upload-to-seedr", methods=["POST"])
 def upload_magnet():
