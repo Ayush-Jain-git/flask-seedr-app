@@ -50,7 +50,7 @@ def get_magnet():
 
 def upload_to_seedr(magnet_link):
 
-     print("Starting Seedr upload process...")
+    print("Starting Seedr upload process...")
 
     # Memory usage before Chrome opens
     print("Memory usage before Chrome (MB):", psutil.virtual_memory().used / 1024 / 1024)
